@@ -23,7 +23,6 @@ cmake --build . -j
 - Find the build file at `C:\Users\OwenS\OneDrive\Documents\Programs\NCSU ASME SDC\ASME_SDC_2526_C++\genisis\build\genisis.uf2`
 
 ### Compile the code (option B):
-### Compile the code (option A):
 - Open the start menu
 - Launch "Developer PowerShell for VS"
 - Run `cd "C:\Users\OwenS\OneDrive\Documents\Programs\NCSU ASME SDC\ASME_SDC_2526_C++\genisis"`
