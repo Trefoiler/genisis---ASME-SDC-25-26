@@ -2,7 +2,7 @@
 
 ## Using the Pico
 
-### Compile the code:
+### Compile the code (option A):
 - Open the start menu
 - Launch "Developer PowerShell for VS"
 - Run each of these commands:
@@ -21,6 +21,22 @@ cmake -G Ninja -DCMAKE_MAKE_PROGRAM="C:\Users\OwenS\.pico-sdk\ninja\v1.12.1\ninj
 cmake --build . -j
 ```
 - Find the build file at `C:\Users\OwenS\OneDrive\Documents\Programs\NCSU ASME SDC\ASME_SDC_2526_C++\genisis\build\genisis.uf2`
+
+### Compile the code (option B):
+### Compile the code (option A):
+- Open the start menu
+- Launch "Developer PowerShell for VS"
+- Run `cd "C:\Users\OwenS\OneDrive\Documents\Programs\NCSU ASME SDC\ASME_SDC_2526_C++\genisis"`
+- Run any of:
+    - `.\build.ps1` to do a normal build
+    - `.\build.ps1 -Clean` to do a clean build, which is needed when:
+        - changes have been made to `CMakeLists.txt`
+        - source files have been renamed/moved
+        - project structure/folders have changed
+        - you want to be sure everything rebuilds from scratch
+        - NOT when you just edited normal `.c`, `.h`, or `.cpp` files
+    - `.\build.ps1 -OpenUf2` to do a normal build and then locate the build file location
+    - `.\build.ps1 -Clean -OpenUf2` to do a clean build then locate the build file location
 
 ### Flash the code:
 - Plug in the Pico 2 W in BOOTSEL mode
