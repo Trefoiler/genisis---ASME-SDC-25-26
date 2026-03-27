@@ -17,17 +17,20 @@ add_executable(${PROJECT_NAME}
     src/main.c
     src/controller/bluepad32_platform.c
     src/controller/controller_state.c
+    src/tests/test_input.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     src
     src/controller
+    src/tests
     ${BLUEPAD32_ROOT}/src/components/bluepad32/include
 )
 
 include_directories(
     src
     src/controller
+    src/tests
 )
 
 include_directories(${BTSTACK_ROOT}/3rd-party/bluedroid/encoder/include)

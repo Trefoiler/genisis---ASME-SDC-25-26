@@ -4,11 +4,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Raw controller data straight from Bluepad32.
-// Keep this around so we always have the original values if needed.
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     bool connected;
 
+    // Raw values from Bluepad32
     uint8_t dpad;
 
     int32_t x;
@@ -33,13 +36,32 @@ typedef struct {
     uint8_t battery;
 } ControllerState;
 
-// Reset everything to a safe default state.
-void controller_state_init(void);
+// Virtual buttons used by the rest of the project.
+// D-pad directions are included here too.
+typedef enum {
+    CONTROLLER_BUTTON_X = 0,
+    CONTROLLER_BUTTON_CIRCLE,
+    CONTROLLER_BUTTON_SQUARE,
+    CONTROLLER_BUTTON_TRIANGLE,
+    CONTROLLER_BUTTON_L1,
+    CONTROLLER_BUTTON_R1,
+    CONTROLLER_BUTTON_L2,
+    CONTROLLER_BUTTON_R2,
+    CONTROLLER_BUTTON_L3,
+    CONTROLLER_BUTTON_R3,
+    CONTROLLER_BUTTON_PS,
+    CONTROLLER_BUTTON_SHARE,
+    CONTROLLER_BUTTON_OPTIONS,
+    CONTROLLER_BUTTON_DPAD_UP,
+    CONTROLLER_BUTTON_DPAD_DOWN,
+    CONTROLLER_BUTTON_DPAD_RIGHT,
+    CONTROLLER_BUTTON_DPAD_LEFT,
+    CONTROLLER_BUTTON_COUNT
+} ControllerButton;
 
-// Mark the controller as disconnected and clear all inputs.
+void controller_state_init(void);
 void controller_state_set_disconnected(void);
 
-// Store the newest raw controller values.
 void controller_state_update(uint8_t dpad,
                              int32_t x,
                              int32_t y,
@@ -57,18 +79,27 @@ void controller_state_update(uint8_t dpad,
                              int32_t accel_z,
                              uint8_t battery);
 
-// Read the latest raw state.
 const ControllerState* controller_state_get(void);
 
-// Clean helper functions for robot code.
-// Sticks return -1.0 to 1.0.
-// Triggers return 0.0 to 1.0.
-// Y axes are flipped so up is positive.
+bool controller_connected(void);
+unsigned int controller_battery_percent(void);
+
+// Clean analog helpers
 float controller_left_x(void);
 float controller_left_y(void);
 float controller_right_x(void);
 float controller_right_y(void);
 float controller_left_trigger(void);
 float controller_right_trigger(void);
+
+// Unified button helpers
+bool controller_button_down(ControllerButton button);
+bool controller_button_pressed(ControllerButton button);
+bool controller_button_released(ControllerButton button);
+const char* controller_button_name(ControllerButton button);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
