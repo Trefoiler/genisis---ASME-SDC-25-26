@@ -10,7 +10,7 @@ static uint32_t g_curr_button_mask = 0;
 #define STICK_CENTER_OFFSET 4
 #define STICK_SCALE 512.0f
 #define TRIGGER_SCALE 1020.0f
-#define STICK_DEADZONE 0.03f
+#define STICK_DEADZONE 0.01f // 1% joystick deadzone
 
 // Raw DS4 button bits from your testing
 #define RAW_BTN_X               0x0001
