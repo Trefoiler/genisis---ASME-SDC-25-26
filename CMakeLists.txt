@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME}
     src/controller/bluepad32_platform.c
     src/controller/controller_state.c
     src/tests/test_input.cpp
+    src/tests/test_controller_motor.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -39,6 +40,7 @@ include_directories(${BTSTACK_ROOT}/src)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     pico_stdlib
+    hardware_pwm
     pico_cyw43_arch_none
     pico_btstack_classic
     pico_btstack_cyw43
@@ -51,3 +53,18 @@ pico_enable_stdio_usb(${PROJECT_NAME} 1)
 pico_enable_stdio_uart(${PROJECT_NAME} 0)
 
 pico_add_extra_outputs(${PROJECT_NAME})
+
+# Standalone motor test (DRV8871, no Bluepad32)
+add_executable(motor_test
+    src/tests/test_motor.cpp
+)
+
+target_link_libraries(motor_test PUBLIC
+    pico_stdlib
+    hardware_pwm
+)
+
+pico_enable_stdio_usb(motor_test 1)
+pico_enable_stdio_uart(motor_test 0)
+
+pico_add_extra_outputs(motor_test)
