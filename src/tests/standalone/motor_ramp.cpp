@@ -1,28 +1,27 @@
-// test_motor.cpp
-// Standalone motor test for DRV8871 via PWM.
-// Ramps the motor forward, brakes, ramps reverse, brakes, and repeats.
+// motor_ramp.cpp
+// Standalone motor test for DRV8871 via PWM. No Bluetooth, no controller.
+// Ramps forward 0→100% over 5s, full power 5s, ramps down 100→0% over 5s,
+// brakes 3s, coasts 3s, then repeats.
 //
 // Wiring (DRV8871):
 //   GP14 → IN1
 //   GP15 → IN2
 //   Pico GND → DRV8871 GND
-//   Battery (+) → VMotor, Battery (-) → DRV8871 GND
+//   Battery (+) → VMotor, Battery (−) → DRV8871 GND
 
 #include <cstdio>
 #include <hardware/gpio.h>
 #include <hardware/pwm.h>
 #include <pico/stdlib.h>
 
-// GPIO pins connected to DRV8871 IN1 and IN2.
 // GP14 = PWM slice 7 channel A, GP15 = PWM slice 7 channel B.
 #define MOTOR_IN1_PIN 14
 #define MOTOR_IN2_PIN 15
 
-// PWM configuration.
 // RP2350 default system clock: 150 MHz
 // clkdiv=15, wrap=9999 → 150MHz / 15 / 10000 = 1000 Hz
-#define PWM_WRAP     9999u
-#define PWM_CLKDIV   15.0f
+#define PWM_WRAP    9999u
+#define PWM_CLKDIV  15.0f
 
 static uint s_slice;
 static uint s_chan_in1;
@@ -48,7 +47,7 @@ static void motor_init(void) {
 
 // speed: -1.0 (full reverse) to +1.0 (full forward), 0.0 = coast
 static void motor_set(float speed) {
-    if (speed > 1.0f)  speed = 1.0f;
+    if (speed >  1.0f) speed =  1.0f;
     if (speed < -1.0f) speed = -1.0f;
 
     if (speed > 0.0f) {
@@ -73,34 +72,29 @@ int main(void) {
     stdio_init_all();
     motor_init();
 
-    std::printf("motor_test: starting\n");
+    std::printf("motor_ramp: starting\n");
 
     while (true) {
-        // Ramp forward 0% → 100% over 5 seconds
-        std::printf("motor_test: ramping up\n");
+        std::printf("motor_ramp: ramping up\n");
         for (int i = 0; i <= 100; i++) {
             motor_set(i / 100.0f);
             sleep_ms(50);
         }
 
-        // Full power for 5 seconds
-        std::printf("motor_test: full power\n");
+        std::printf("motor_ramp: full power\n");
         sleep_ms(5000);
 
-        // Ramp down 100% → 0% over 5 seconds
-        std::printf("motor_test: ramping down\n");
+        std::printf("motor_ramp: ramping down\n");
         for (int i = 100; i >= 0; i--) {
             motor_set(i / 100.0f);
             sleep_ms(50);
         }
 
-        // Active brake for 3 seconds
-        std::printf("motor_test: brake\n");
+        std::printf("motor_ramp: brake\n");
         motor_brake();
         sleep_ms(3000);
 
-        // Free spin (coast) for 3 seconds
-        std::printf("motor_test: coast\n");
+        std::printf("motor_ramp: coast\n");
         motor_set(0.0f);
         sleep_ms(3000);
     }

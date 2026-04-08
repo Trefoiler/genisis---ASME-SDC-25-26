@@ -5,8 +5,9 @@
 
 #include "controller_state.h"
 #include "sdkconfig.h"
-#include "test_input.h"
-#include "test_esc_controller.h"
+#include "input_monitor.h"
+#include "motor_test.h"
+#include "motor.h"
 
 #ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
 #error "Pico W must use BLUEPAD32_PLATFORM_CUSTOM"
@@ -18,8 +19,9 @@ static void my_platform_init(int argc, const char** argv) {
 
     logi("controller: init\n");
     controller_state_init();
-    test_input_init();
-    test_esc_controller_init();
+    input_monitor_init();
+    motor_test_init();
+    motors_init();
 }
 
 static void my_platform_on_init_complete(void) {
@@ -51,8 +53,8 @@ static void my_platform_on_device_connected(uni_hid_device_t* d) {
 static void my_platform_on_device_disconnected(uni_hid_device_t* d) {
     logi("controller: disconnected (%p)\n", d);
     controller_state_set_disconnected();
-    test_input_update();
-    test_esc_controller_update();
+    motors_stop_all();
+    input_monitor_update();
 }
 
 static uni_error_t my_platform_on_device_ready(uni_hid_device_t* d) {
@@ -88,8 +90,8 @@ static void my_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
         ctl->battery
     );
 
-    test_input_update();
-    test_esc_controller_update();
+    input_monitor_update();
+    motor_test_update();
 }
 
 static const uni_property_t* my_platform_get_property(uni_property_idx_t idx) {

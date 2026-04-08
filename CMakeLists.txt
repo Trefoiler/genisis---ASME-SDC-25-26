@@ -17,21 +17,24 @@ add_executable(${PROJECT_NAME}
     src/main.c
     src/controller/bluepad32_platform.c
     src/controller/controller_state.c
-    src/tests/test_input.cpp
-    src/tests/test_esc_controller.cpp
+    src/tests/integrated/input_monitor.cpp
+    src/tests/integrated/motor_test.cpp
+    src/motor/motor.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     src
     src/controller
-    src/tests
+    src/tests/integrated
+    src/motor
     ${BLUEPAD32_ROOT}/src/components/bluepad32/include
 )
 
 include_directories(
     src
     src/controller
-    src/tests
+    src/tests/integrated
+    src/motor
 )
 
 include_directories(${BTSTACK_ROOT}/3rd-party/bluedroid/encoder/include)
@@ -54,17 +57,17 @@ pico_enable_stdio_uart(${PROJECT_NAME} 0)
 
 pico_add_extra_outputs(${PROJECT_NAME})
 
-# Standalone motor test (DRV8871, no Bluepad32)
-add_executable(motor_test
-    src/tests/test_motor.cpp
+# Standalone motor ramp test (DRV8871, no Bluepad32)
+add_executable(motor_ramp
+    src/tests/standalone/motor_ramp.cpp
 )
 
-target_link_libraries(motor_test PUBLIC
+target_link_libraries(motor_ramp PUBLIC
     pico_stdlib
     hardware_pwm
 )
 
-pico_enable_stdio_usb(motor_test 1)
-pico_enable_stdio_uart(motor_test 0)
+pico_enable_stdio_usb(motor_ramp 1)
+pico_enable_stdio_uart(motor_ramp 0)
 
-pico_add_extra_outputs(motor_test)
+pico_add_extra_outputs(motor_ramp)

@@ -174,5 +174,19 @@ Unlike the DRV8833/8871, this ESC is controlled by standard RC PPM pulses, not r
 
 ### Pico 2 W GPIO Assignments
 
-> _TBD — add a full table of which GPIO pins are assigned to what (motors, servos, sensors, etc.) once hardware is finalized._
+| GPIO | Function         | Notes                                      |
+|------|------------------|--------------------------------------------|
+| GP0  | (reserved)       | UART0 TX — keep free                       |
+| GP1  | (reserved)       | UART0 RX — keep free                       |
+| GP2  | ESC 1 — PPM1     | Motor: Front-Left (PWM slice 1A)           |
+| GP3  | ESC 1 — PPM2     | Motor: Front-Right (PWM slice 1B)          |
+| GP4  | ESC 2 — PPM1     | Motor: Back-Left (PWM slice 2A)            |
+| GP5  | ESC 2 — PPM2     | Motor: Back-Right (PWM slice 2B)           |
+| GP6  | ESC 3 — PPM1     | Motor: Strafe (PWM slice 3A)        |
+| GP7  | ESC 3 — PPM2     | Spare ESC channel (PWM slice 3B)           |
+| …    | _TBD_            | Servos, sensors — to be assigned           |
+
+> ESC pairs (PPM1+PPM2) must share the same PWM slice for consistent 50Hz timing. Consecutive even/odd GPIO pairs always share a slice on the RP2350.
+
+> GP14/GP15 are used in the current ESC test code (`test_esc_controller.cpp`) and will be reassigned once the motor abstraction layer is implemented.
 

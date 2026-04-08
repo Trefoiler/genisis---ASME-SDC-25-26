@@ -4,7 +4,7 @@
 
 extern "C" {
 #include "controller_state.h"
-#include "test_input.h"
+#include "input_monitor.h"
 }
 
 static constexpr uint32_t ANALOG_LOG_INTERVAL_MS = 100;
@@ -33,17 +33,17 @@ static void print_unsigned_value(const char* label, float value) {
     std::printf("%s=%d.%02d", label, scaled / 100, scaled % 100);
 }
 
-extern "C" void test_input_init(void) {
+extern "C" void input_monitor_init(void) {
     s_was_connected = false;
     s_last_analog_log_ms = 0;
 }
 
-extern "C" void test_input_update(void) {
+extern "C" void input_monitor_update(void) {
     if (controller_connected() && !s_was_connected) {
-        std::printf("test_input: controller connected\n");
+        std::printf("input_monitor: controller connected\n");
     }
     if (!controller_connected() && s_was_connected) {
-        std::printf("test_input: controller disconnected\n");
+        std::printf("input_monitor: controller disconnected\n");
     }
     s_was_connected = controller_connected();
 
@@ -68,12 +68,11 @@ extern "C" void test_input_update(void) {
     float lt = controller_left_trigger();
     float rt = controller_right_trigger();
 
-    bool left_active = (lx != 0.0f) || (ly != 0.0f);
+    bool left_active  = (lx != 0.0f) || (ly != 0.0f);
     bool right_active = (rx != 0.0f) || (ry != 0.0f);
-    bool lt_active = (lt != 0.0f);
-    bool rt_active = (rt != 0.0f);
+    bool lt_active    = (lt != 0.0f);
+    bool rt_active    = (rt != 0.0f);
 
-    // If nothing analog is being moved/pressed, do not print a periodic line.
     if (!left_active && !right_active && !lt_active && !rt_active) {
         return;
     }
@@ -96,9 +95,7 @@ extern "C" void test_input_update(void) {
     }
 
     if (right_active) {
-        if (printed_anything) {
-            std::printf(" ");
-        }
+        if (printed_anything) std::printf(" ");
         std::printf("right(");
         print_signed_value("x", rx);
         std::printf(" ");
@@ -108,17 +105,13 @@ extern "C" void test_input_update(void) {
     }
 
     if (lt_active) {
-        if (printed_anything) {
-            std::printf(" ");
-        }
+        if (printed_anything) std::printf(" ");
         print_unsigned_value("lt", lt);
         printed_anything = true;
     }
 
     if (rt_active) {
-        if (printed_anything) {
-            std::printf(" ");
-        }
+        if (printed_anything) std::printf(" ");
         print_unsigned_value("rt", rt);
         printed_anything = true;
     }
