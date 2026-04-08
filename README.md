@@ -52,9 +52,19 @@ cmake --build . -j
 
 ## Electronics
 
-### Motor Drivers
+### Motor Controllers
 
-#### [DRV8833](https://www.aliexpress.us/item/3256808500729294.html?src=google&src=google&albch=shopping&acnt=708-803-3821&isdl=y&slnk=&plac=&mtctp=&albbt=Google_7_shopping&aff_platform=google&aff_short_key=UneMJZVf&albagn=888888&ds_e_adid=&ds_e_matchtype=&ds_e_device=c&ds_e_network=x&ds_e_product_group_id=&ds_e_product_id=en3256808500729294&ds_e_product_merchant_id=5564243987&ds_e_product_country=US&ds_e_product_language=en&ds_e_product_channel=online&ds_e_product_store_id=&ds_url_v=2&albcp=19558607238&albag=&isSmbAutoCall=false&needSmbHouyi=false&gatewayAdapt=glo2usa#nav-specification) — Dual-Channel DC Motor Driver
+> Comparison summary:
+>
+> | Controller | Channels | Current | Voltage | Control signal | Pico pins needed |
+> |------------|----------|---------|---------|----------------|-----------------|
+> | DRV8833    | 2        | 1.5A/ch | 3–10V   | IN1/IN2 PWM    | 4 GPIO          |
+> | DRV8871    | 1        | 3.6A pk | 6.5–45V | IN1/IN2 PWM    | 2 GPIO          |
+> | Flipsky ESC| 2        | 5A/ch   | 6–14V   | PPM (RC servo) | 1–2 GPIO        |
+
+---
+
+#### DRV8833 — Dual-Channel DC Motor Driver
 - **Supply voltage:** 2.7V–10.8V (motor side); logic 3.3V compatible
 - **Current:** 1.5A continuous / 2A peak per channel
 - **Channels:** 2 independent H-bridges (Motor A: OUT1/OUT2, Motor B: OUT3/OUT4)
@@ -63,65 +73,96 @@ cmake --build . -j
 
 **Pin mapping:**
 
-| Module Pin | Connects to       | Notes                        |
-|------------|-------------------|------------------------------|
-| IN1        | Pico GPIO (PWM)   | Motor A direction/speed      |
-| IN2        | Pico GPIO (PWM)   | Motor A direction/speed      |
-| IN3        | Pico GPIO (PWM)   | Motor B direction/speed      |
-| IN4        | Pico GPIO (PWM)   | Motor B direction/speed      |
-| GND        | Common GND        |                              |
-| VCC        | Motor power supply| 3V–10V                       |
-| OUT1–OUT4  | Motor terminals   |                              |
-| SLEEP      | Pico GPIO or VCC  | Pull HIGH to enable          |
-| EEP/nFAULT | Pico GPIO (input) | Optional fault detection     |
+| Module Pin  | Connects to        | Notes                            |
+|-------------|--------------------|----------------------------------|
+| IN1         | Pico GPIO (PWM)    | Motor A direction/speed          |
+| IN2         | Pico GPIO (PWM)    | Motor A direction/speed          |
+| IN3         | Pico GPIO (PWM)    | Motor B direction/speed          |
+| IN4         | Pico GPIO (PWM)    | Motor B direction/speed          |
+| VCC         | Motor power supply | 3V–10V                           |
+| GND         | Common GND         |                                  |
+| OUT1–OUT4   | Motor terminals    |                                  |
+| SLEEP       | Pico GPIO or VCC   | Pull HIGH to enable              |
+| EEP/nFAULT  | Pico GPIO (input)  | Optional fault detection         |
 
 **Control logic (per channel):**
 
-| IN_A | IN_B | Motor behavior     |
-|------|------|--------------------|
-| PWM  | LOW  | Forward at speed   |
-| LOW  | PWM  | Reverse at speed   |
-| HIGH | HIGH | Brake (active stop)|
-| LOW  | LOW  | Coast (freewheel)  |
+| IN_A | IN_B | Motor behavior      |
+|------|------|---------------------|
+| PWM  | LOW  | Forward at speed    |
+| LOW  | PWM  | Reverse at speed    |
+| HIGH | HIGH | Brake (active stop) |
+| LOW  | LOW  | Coast (freewheel)   |
 
 Speed is set by PWM duty cycle (0–100%) on the active IN pin. Recommended PWM frequency: 1kHz–20kHz.
 
 ---
 
-#### [DRV8871](https://www.adafruit.com/product/3190?srsltid=AfmBOoqrHaKgkMo3pqW3c-sySkwM7nNNwSVYoT-E6YyM2p9z19s4wzS5) — Single-Channel DC Motor Driver (Adafruit #3190)
+#### DRV8871 — Single-Channel DC Motor Driver ([Adafruit #3190](https://www.adafruit.com/product/3190))
 - **Supply voltage:** 6.5V–45V (motor side); logic up to 5.5V (3.3V compatible)
 - **Current:** 3.6A peak; default ~2A limit (adjustable via Rlim resistor)
 - **Channels:** 1 H-bridge (single motor)
-- **Overcurrent protection:** Yes (current limiting via Rlim — no inline sense resistor needed)
-- **Additional protections:** Undervoltage lockout, thermal shutdown
+- **Protections:** Current limiting (no inline sense resistor needed), undervoltage lockout, thermal shutdown
 
 **Pin mapping:**
 
-| Pin     | Connects to        | Notes                           |
-|---------|--------------------|---------------------------------|
-| IN1     | Pico GPIO (PWM)    | Direction/speed control         |
-| IN2     | Pico GPIO (PWM)    | Direction/speed control         |
-| VMotor  | Motor power supply | 6.5V–45V (screw terminal)       |
-| GND     | Common GND         | (screw terminal)                |
-| OUT     | Motor terminals    | (screw terminal)                |
-| Rlim    | Resistor to GND    | Sets current limit; 30kΩ default (~2A) |
+| Pin    | Connects to        | Notes                                  |
+|--------|--------------------|----------------------------------------|
+| IN1    | Pico GPIO (PWM)    | Direction/speed control                |
+| IN2    | Pico GPIO (PWM)    | Direction/speed control                |
+| VMotor | Motor power supply | 6.5V–45V (screw terminal)              |
+| GND    | Common GND         | (screw terminal)                       |
+| OUT    | Motor terminals    | (screw terminal)                       |
+| Rlim   | Resistor to GND    | Sets current limit; 30kΩ default (~2A) |
 
-**Control logic:**
+**Control logic:** Same IN1/IN2 PWM scheme as the DRV8833 (see above). Use this driver for higher-voltage or higher-current motors.
 
-| IN1  | IN2  | Motor behavior     |
-|------|------|--------------------|
-| PWM  | LOW  | Forward at speed   |
-| LOW  | PWM  | Reverse at speed   |
-| HIGH | HIGH | Brake (active stop)|
-| LOW  | LOW  | Coast (freewheel)  |
+---
 
-Same PWM control scheme as the DRV8833. Use this driver for higher-voltage or higher-current motors.
+#### Flipsky Brushed ESC — Dual-Channel ([AliExpress](https://www.aliexpress.com/i/2255800780744923.html))
+- **Supply voltage:** 6V–14V (2S–3S LiPo)
+- **Current:** 5A per channel (10A total)
+- **Channels:** 2 (drives two brushed motors)
+- **Motor compatibility:** 130/180 brushed motors
+- **Protections:** 130°C thermal shutdown, hardware overcurrent, signal loss protection, undervoltage cutoff below 4V
+- **Dimensions:** 24×45mm
+
+**Control signal — PPM (RC servo format):**
+
+Unlike the DRV8833/8871, this ESC is controlled by standard RC PPM pulses, not raw IN/IN PWM. The Pico generates a 50Hz signal with a pulse width between 1ms and 2ms.
+
+| Pulse width | Motor behavior |
+|-------------|----------------|
+| 1.0ms       | Full reverse   |
+| 1.5ms       | Stop (neutral) |
+| 2.0ms       | Full forward   |
+
+**Pin mapping:**
+
+| ESC wire   | Connects to       | Notes                              |
+|------------|-------------------|------------------------------------|
+| PPM1       | Pico GPIO (PWM)   | Controls channel 1 (or both in sync mode) |
+| PPM2       | Pico GPIO (PWM)   | Controls channel 2 (differential/independent modes) |
+| Power +    | LiPo battery +    | 6V–14V                             |
+| Power −    | LiPo battery −    | Also connect to Pico GND           |
+| Motor A +/−| Motor terminals   |                                    |
+| Motor B +/−| Motor terminals   |                                    |
+
+**Operating modes** (hardware toggle switch on board):
+
+| Mode          | PPM signals | Behavior                                      |
+|---------------|-------------|-----------------------------------------------|
+| Differential  | 2           | Tank steering — each channel controlled independently |
+| Synchronous   | 1           | Both motors mirror the same signal            |
+| Independent   | 2           | Fully separate control per channel            |
+
+**Arming requirement:** On power-up, the PPM signal must be at neutral (1.5ms) before the ESC will respond. If signal is lost, return to neutral and re-arm. This is a safety feature — factor it into startup code.
 
 ---
 
 ### Motors
 
-> _TBD — add motor model, voltage/current ratings, and which DRV8833 channel each motor connects to._
+> _TBD — add motor model, voltage/current ratings, and which controller/channel each motor connects to._
 
 ---
 

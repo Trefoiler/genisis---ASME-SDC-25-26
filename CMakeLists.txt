@@ -18,7 +18,7 @@ add_executable(${PROJECT_NAME}
     src/controller/bluepad32_platform.c
     src/controller/controller_state.c
     src/tests/test_input.cpp
-    src/tests/test_controller_motor.cpp
+    src/tests/test_esc_controller.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
