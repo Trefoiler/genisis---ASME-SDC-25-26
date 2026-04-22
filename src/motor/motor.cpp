@@ -28,6 +28,11 @@ extern "C" {
 #define PPM_RANGE     500u   // counts from neutral to min/max
 #define ARM_DELAY_MS 2000
 
+// Slew rate limiter: prevents rapid direction reversals from tripping ESC overcurrent protection.
+// Full reversal (+1.0 to -1.0) takes at minimum 1/SLEW_RATE_PER_SEC * 2 seconds (~200ms at 10.0).
+#define SLEW_RATE_PER_SEC 10.0f
+#define SLEW_MAX_DT_S     0.1f   // cap dt so a long pause can't bypass the limiter
+
 #define RP2350_PWM_SLICES 12
 
 struct MotorConfig {
@@ -47,8 +52,10 @@ static const MotorConfig motor_configs[MOTOR_COUNT] = {
 };
 
 static struct {
-    uint slice;
-    uint channel;
+    uint     slice;
+    uint     channel;
+    float    current_power;
+    uint64_t last_us;
 } motor_state[MOTOR_COUNT];
 
 static uint power_to_counts(float power) {
@@ -78,6 +85,7 @@ extern "C" void motors_init(void) {
         }
 
         pwm_set_chan_level(slice, channel, PPM_NEUTRAL);
+        motor_state[i].current_power = 0.0f;
     }
 
     for (int s = 0; s < RP2350_PWM_SLICES; s++) {
@@ -89,16 +97,35 @@ extern "C" void motors_init(void) {
     std::printf("motors: arming...\n");
     sleep_ms(ARM_DELAY_MS);
     std::printf("motors: armed (%d motors)\n", (int)MOTOR_COUNT);
+
+    uint64_t now = time_us_64();
+    for (int i = 0; i < MOTOR_COUNT; i++) motor_state[i].last_us = now;
 }
 
 extern "C" void motor_set_power(MotorId id, float power) {
     if (id < 0 || id >= MOTOR_COUNT) return;
     if (motor_configs[id].invert) power = -power;
-    pwm_set_chan_level(motor_state[id].slice, motor_state[id].channel, power_to_counts(power));
+
+    uint64_t now = time_us_64();
+    float dt = (float)(now - motor_state[id].last_us) * 1e-6f;
+    if (dt > SLEW_MAX_DT_S) dt = SLEW_MAX_DT_S;
+    motor_state[id].last_us = now;
+
+    float max_step = SLEW_RATE_PER_SEC * dt;
+    float diff = power - motor_state[id].current_power;
+    if (diff >  max_step) diff =  max_step;
+    if (diff < -max_step) diff = -max_step;
+    motor_state[id].current_power += diff;
+
+    pwm_set_chan_level(motor_state[id].slice, motor_state[id].channel,
+                      power_to_counts(motor_state[id].current_power));
 }
 
 extern "C" void motors_stop_all(void) {
+    uint64_t now = time_us_64();
     for (int i = 0; i < MOTOR_COUNT; i++) {
         pwm_set_chan_level(motor_state[i].slice, motor_state[i].channel, PPM_NEUTRAL);
+        motor_state[i].current_power = 0.0f;
+        motor_state[i].last_us = now;
     }
 }
