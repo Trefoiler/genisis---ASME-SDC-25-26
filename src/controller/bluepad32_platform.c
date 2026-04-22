@@ -8,6 +8,7 @@
 #include "input_monitor.h"
 #include "motor_test.h"
 #include "motor.h"
+#include "servo.h"
 
 #ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
 #error "Pico W must use BLUEPAD32_PLATFORM_CUSTOM"
@@ -22,6 +23,7 @@ static void my_platform_init(int argc, const char** argv) {
     input_monitor_init();
     motor_test_init();
     motors_init();
+    servos_init();
 }
 
 static void my_platform_on_init_complete(void) {
@@ -54,6 +56,7 @@ static void my_platform_on_device_disconnected(uni_hid_device_t* d) {
     logi("controller: disconnected (%p)\n", d);
     controller_state_set_disconnected();
     motors_stop_all();
+    servos_center_all();
     input_monitor_update();
 }
 

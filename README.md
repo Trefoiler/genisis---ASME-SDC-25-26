@@ -182,11 +182,14 @@ Unlike the DRV8833/8871, this ESC is controlled by standard RC PPM pulses, not r
 | GP3  | ESC 1 — PPM2     | Motor: Front-Right (PWM slice 1B)          |
 | GP4  | ESC 2 — PPM1     | Motor: Back-Left (PWM slice 2A)            |
 | GP5  | ESC 2 — PPM2     | Motor: Back-Right (PWM slice 2B)           |
-| GP6  | ESC 3 — PPM1     | Motor: Strafe (PWM slice 3A)        |
-| GP7  | ESC 3 — PPM2     | Spare ESC channel (PWM slice 3B)           |
-| …    | _TBD_            | Servos, sensors — to be assigned           |
+| GP6  | ESC 3 — PPM1     | Motor: Strafe (PWM slice 3A)               |
+| GP7  | ESC 3 — PPM2     | Motor: AUX1 — mechanism TBD (PWM slice 3B) |
+| GP8  | ESC 4 — PPM1     | Motor: AUX2 — mechanism TBD (PWM slice 4A) |
+| GP9  | ESC 4 — PPM2     | Motor: AUX3 — mechanism TBD (PWM slice 4B) |
+| GP13 | Servo 3 — signal | Mechanism TBD (PWM slice 6B)               |
+| GP14 | Servo 2 — signal | Mechanism TBD (PWM slice 7A)               |
+| GP15 | Servo 1 — signal | Mechanism TBD (PWM slice 7B)               |
+| …    | _TBD_            | Sensors — to be assigned                  |
 
 > ESC pairs (PPM1+PPM2) must share the same PWM slice for consistent 50Hz timing. Consecutive even/odd GPIO pairs always share a slice on the RP2350.
-
-> GP14/GP15 are used in the current ESC test code (`test_esc_controller.cpp`) and will be reassigned once the motor abstraction layer is implemented.
 

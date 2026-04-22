@@ -11,6 +11,9 @@ typedef enum {
     MOTOR_BL,      // back left
     MOTOR_BR,      // back right
     MOTOR_STRAFE,  // H-drive (strafe)
+    MOTOR_AUX1,   // auxiliary motor 1 (mechanism TBD)
+    MOTOR_AUX2,   // auxiliary motor 2 (mechanism TBD)
+    MOTOR_AUX3,   // auxiliary motor 3 (mechanism TBD)
     MOTOR_COUNT
 } MotorId;
 

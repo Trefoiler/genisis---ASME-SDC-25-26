@@ -3,11 +3,14 @@
 // Each motor maps to a GPIO pin; pairs on the same PWM slice share timing.
 //
 // Pin assignments (consecutive even/odd pairs share a slice):
-//   GP2 → MOTOR_FL  (slice 1A)
-//   GP3 → MOTOR_FR  (slice 1B)
-//   GP4 → MOTOR_BL  (slice 2A)
-//   GP5 → MOTOR_BR  (slice 2B)
-//   GP6 → MOTOR_STRAFE  (slice 3A)
+//   GP2 → MOTOR_FL      (ESC1 PPM1, slice 1A)
+//   GP3 → MOTOR_FR      (ESC1 PPM2, slice 1B)
+//   GP4 → MOTOR_BL      (ESC2 PPM1, slice 2A)
+//   GP5 → MOTOR_BR      (ESC2 PPM2, slice 2B)
+//   GP6 → MOTOR_STRAFE  (ESC3 PPM1, slice 3A)
+//   GP7 → MOTOR_AUX1    (ESC3 PPM2, slice 3B)
+//   GP8 → MOTOR_AUX2    (ESC4 PPM1, slice 4A)
+//   GP9 → MOTOR_AUX3    (ESC4 PPM2, slice 4B)
 
 #include <cstdio>
 #include <hardware/gpio.h>
@@ -38,6 +41,9 @@ static const MotorConfig motor_configs[MOTOR_COUNT] = {
     [MOTOR_BL] = { 4, false },
     [MOTOR_BR] = { 5, false },
     [MOTOR_STRAFE] = { 6, false },
+    [MOTOR_AUX1]   = { 7, false },
+    [MOTOR_AUX2]   = { 8, false },
+    [MOTOR_AUX3]   = { 9, false },
 };
 
 static struct {
