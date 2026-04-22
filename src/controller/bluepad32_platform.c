@@ -14,6 +14,25 @@
 #error "Pico W must use BLUEPAD32_PLATFORM_CUSTOM"
 #endif
 
+static void update_lightbar(uni_hid_device_t* d) {
+    if (d->report_parser.set_lightbar_color == NULL) return;
+
+    unsigned int pct = controller_battery_percent();
+    if (pct == 0) return; // 0 means battery value not available
+
+    uint8_t r, g;
+    if (pct >= 50) {
+        // Green -> Yellow: ramp red up as battery drops from 100% to 50%
+        r = (uint8_t)((100u - pct) * 255u / 50u);
+        g = 255;
+    } else {
+        // Yellow -> Red: ramp green down as battery drops from 50% to 0%
+        r = 255;
+        g = (uint8_t)(pct * 255u / 50u);
+    }
+    d->report_parser.set_lightbar_color(d, r, g, 0);
+}
+
 static void my_platform_init(int argc, const char** argv) {
     (void)argc;
     (void)argv;
@@ -62,12 +81,11 @@ static void my_platform_on_device_disconnected(uni_hid_device_t* d) {
 
 static uni_error_t my_platform_on_device_ready(uni_hid_device_t* d) {
     logi("controller: ready (%p)\n", d);
+    update_lightbar(d);
     return UNI_ERROR_SUCCESS;
 }
 
 static void my_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t* ctl) {
-    (void)d;
-
     if (ctl->klass != UNI_CONTROLLER_CLASS_GAMEPAD) {
         return;
     }
@@ -93,6 +111,7 @@ static void my_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
         ctl->battery
     );
 
+    update_lightbar(d);
     input_monitor_update();
     motor_test_update();
 }
