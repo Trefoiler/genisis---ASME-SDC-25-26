@@ -6,8 +6,8 @@
 #include "controller_state.h"
 #include "sdkconfig.h"
 #include "input_monitor.h"
-#include "motor_test.h"
 #include "motor.h"
+#include "robot.h"
 #include "servo.h"
 
 #ifndef CONFIG_BLUEPAD32_PLATFORM_CUSTOM
@@ -40,9 +40,9 @@ static void my_platform_init(int argc, const char** argv) {
     logi("controller: init\n");
     controller_state_init();
     input_monitor_init();
-    motor_test_init();
     motors_init();
     servos_init();
+    robot_init();
 }
 
 static void my_platform_on_init_complete(void) {
@@ -113,7 +113,7 @@ static void my_platform_on_controller_data(uni_hid_device_t* d, uni_controller_t
 
     update_lightbar(d);
     input_monitor_update();
-    motor_test_update();
+    robot_update();
 }
 
 static const uni_property_t* my_platform_get_property(uni_property_idx_t idx) {

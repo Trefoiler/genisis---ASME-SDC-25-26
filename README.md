@@ -193,3 +193,56 @@ Unlike the DRV8833/8871, this ESC is controlled by standard RC PPM pulses, not r
 
 > ESC pairs (PPM1+PPM2) must share the same PWM slice for consistent 50Hz timing. Consecutive even/odd GPIO pairs always share a slice on the RP2350.
 
+---
+
+## Controls
+
+The robot has two states toggled by the Triangle and X buttons. The joystick behavior changes between states; everything else works the same in both.
+
+### State: Ground (default)
+
+| Input | Action |
+|---|---|
+| Left stick Y | Forward / backward (all 4 drive wheels) |
+| Left stick X | Strafe (H-drive wheel) |
+| Right stick X | Turn (drive wheels differential + H-drive contribution) |
+
+### State: Air (front of robot lifted off ground)
+
+| Input | Action |
+|---|---|
+| Left stick X | H-drive wheel (sorting mechanism) |
+| Left stick Y | Ignored |
+| Right stick | Ignored |
+
+### Always Active (both states)
+
+| Input | Action |
+|---|---|
+| Triangle | Set SERVO_3 to lifted position → switch to Air state |
+| X | Set SERVO_3 to ground position → switch to Ground state |
+| D-Pad up | Arm lift motor (AUX1) forward |
+| D-Pad down | Arm lift motor (AUX1) reverse |
+| L1 | Escalator motor 1 (AUX2) on |
+| R1 | Escalator motor 2 (AUX3) on |
+| Right trigger | Close arm (SERVO_1 and SERVO_2 inward, mirrored) |
+| Left trigger | Open arm (SERVO_1 and SERVO_2 outward, mirrored) |
+
+### Motor / Servo Assignments
+
+| ID | Mechanism | ESC / Channel |
+|---|---|---|
+| MOTOR_FL | Front-left drive wheel | ESC1 PPM1 |
+| MOTOR_FR | Front-right drive wheel | ESC1 PPM2 |
+| MOTOR_BL | Back-left drive wheel | ESC2 PPM1 |
+| MOTOR_BR | Back-right drive wheel | ESC2 PPM2 |
+| MOTOR_STRAFE | H-drive center wheel | ESC3 PPM1 |
+| MOTOR_AUX1 | Arm lift | ESC3 PPM2 |
+| MOTOR_AUX2 | Escalator 1 | ESC4 PPM1 |
+| MOTOR_AUX3 | Escalator 2 | ESC4 PPM2 |
+| SERVO_1 | Arm open/close (left side) | GP15 |
+| SERVO_2 | Arm open/close (right side, mirrored) | GP14 |
+| SERVO_3 | Front lift mechanism | GP13 |
+
+> H-drive (MOTOR_STRAFE) is offset halfway between the robot center and the front. It contributes to turning because it is not at the pivot point. A tunable coefficient (`H_DRIVE_TURN_COEFF`) scales this contribution and will be set during testing.
+

@@ -21,6 +21,7 @@ add_executable(${PROJECT_NAME}
     src/tests/integrated/motor_test.cpp
     src/motor/motor.cpp
     src/servo/servo.cpp
+    src/robot/robot.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -29,6 +30,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     src/tests/integrated
     src/motor
     src/servo
+    src/robot
     ${BLUEPAD32_ROOT}/src/components/bluepad32/include
 )
 
@@ -38,6 +40,7 @@ include_directories(
     src/tests/integrated
     src/motor
     src/servo
+    src/robot
 )
 
 include_directories(${BTSTACK_ROOT}/3rd-party/bluedroid/encoder/include)
