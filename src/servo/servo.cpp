@@ -3,9 +3,10 @@
 // No arming sequence needed — servos respond immediately to signal.
 //
 // Pin assignments:
-//   GP15 -> SERVO_1  (slice 7B)
-//   GP14 -> SERVO_2  (slice 7A)
-//   GP13 -> SERVO_3  (slice 6B)
+//   GP15 -> SERVO_1     (slice 7B)
+//   GP14 -> SERVO_2     (slice 7A)
+//   GP13 -> SERVO_3     (slice 6B)
+//   GP12 -> SERVO_UNJAM (slice 6A, shares slice with SERVO_3)
 
 #include <cstdio>
 #include <hardware/gpio.h>
@@ -28,9 +29,10 @@ struct ServoConfig {
 };
 
 static const ServoConfig servo_configs[SERVO_COUNT] = {
-    [SERVO_1] = { 15 },
-    [SERVO_2] = { 14 },
-    [SERVO_3] = { 13 },
+    [SERVO_1]     = { 15 },
+    [SERVO_2]     = { 14 },
+    [SERVO_3]     = { 13 },
+    [SERVO_UNJAM] = { 12 },
 };
 
 static struct {

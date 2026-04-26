@@ -183,12 +183,13 @@ Unlike the DRV8833/8871, this ESC is controlled by standard RC PPM pulses, not r
 | GP4  | ESC 2 — PPM1     | Motor: Back-Left (PWM slice 2A)            |
 | GP5  | ESC 2 — PPM2     | Motor: Back-Right (PWM slice 2B)           |
 | GP6  | ESC 3 — PPM1     | Motor: Strafe (PWM slice 3A)               |
-| GP7  | ESC 3 — PPM2     | Motor: AUX1 — mechanism TBD (PWM slice 3B) |
-| GP8  | ESC 4 — PPM1     | Motor: AUX2 — mechanism TBD (PWM slice 4A) |
-| GP9  | ESC 4 — PPM2     | Motor: AUX3 — mechanism TBD (PWM slice 4B) |
-| GP13 | Servo 3 — signal | Mechanism TBD (PWM slice 6B)               |
-| GP14 | Servo 2 — signal | Mechanism TBD (PWM slice 7A)               |
-| GP15 | Servo 1 — signal | Mechanism TBD (PWM slice 7B)               |
+| GP7  | ESC 3 — PPM2     | Motor: Arm lift (PWM slice 3B)              |
+| GP8  | ESC 4 — PPM1     | Motor: Escalator 1 (PWM slice 4A)          |
+| GP9  | ESC 4 — PPM2     | Motor: Escalator 2 (PWM slice 4B)          |
+| GP12 | Servo 4 — signal | Servo: Unjam (PWM slice 6A, shares slice with GP13) |
+| GP13 | Servo 3 — signal | Servo: Front lift mechanism (PWM slice 6B)          |
+| GP14 | Servo 2 — signal | Servo: Arm open/close, right side mirrored (PWM slice 7A) |
+| GP15 | Servo 1 — signal | Servo: Arm open/close, left side (PWM slice 7B)     |
 | …    | _TBD_            | Sensors — to be assigned                  |
 
 > ESC pairs (PPM1+PPM2) must share the same PWM slice for consistent 50Hz timing. Consecutive even/odd GPIO pairs always share a slice on the RP2350.
@@ -223,10 +224,12 @@ The robot has two states toggled by the Triangle and X buttons. The joystick beh
 | X | Set SERVO_3 to ground position → switch to Ground state |
 | D-Pad up | Arm lift motor (AUX1) forward |
 | D-Pad down | Arm lift motor (AUX1) reverse |
-| L1 | Escalator motor 1 (AUX2) on |
-| R1 | Escalator motor 2 (AUX3) on |
-| Right trigger | Close arm (SERVO_1 and SERVO_2 inward, mirrored) |
-| Left trigger | Open arm (SERVO_1 and SERVO_2 outward, mirrored) |
+| L1 | Open arm (SERVO_1 and SERVO_2 outward, mirrored) |
+| R1 | Close arm (SERVO_1 and SERVO_2 inward, mirrored) |
+| Square | Unjam servo — oscillates 0°↔180° while held, holds position on release |
+| Left trigger | Escalator motor 1 (AUX2) — analog speed control |
+| Right trigger | Escalator motor 2 (AUX3) — analog speed control |
+| Circle | Toggle escalator direction (forward / reverse) |
 
 ### Motor / Servo Assignments
 
@@ -243,6 +246,7 @@ The robot has two states toggled by the Triangle and X buttons. The joystick beh
 | SERVO_1 | Arm open/close (left side) | GP15 |
 | SERVO_2 | Arm open/close (right side, mirrored) | GP14 |
 | SERVO_3 | Front lift mechanism | GP13 |
+| SERVO_UNJAM | Unjam servo (oscillates 0°↔180° while Square held) | GP12 |
 
 > H-drive (MOTOR_STRAFE) is offset halfway between the robot center and the front. It contributes to turning because it is not at the pivot point. A tunable coefficient (`H_DRIVE_TURN_COEFF`) scales this contribution and will be set during testing.
 

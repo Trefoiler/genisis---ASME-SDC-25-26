@@ -9,6 +9,7 @@ typedef enum {
     SERVO_1 = 0,
     SERVO_2,
     SERVO_3,
+    SERVO_UNJAM,
     SERVO_COUNT
 } ServoId;
 
